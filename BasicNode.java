@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.awt.Color;
 
 public class BasicNode {
     private ArrayList<BasicNode> neighbors;
@@ -21,12 +22,17 @@ public class BasicNode {
         }
     }
 
+    public Color getColor()
+    {
+        return Color.red;
+    }
+    
     public boolean affect() {
         return effect.affect();
     }
 
     public ArrayList<BasicNode> getNeighbors() {
-        return neighbors;
+        return new ArrayList(neighbors);  //return a (shallow) copy of the array list instead?
     }
 
     public String toString() {
