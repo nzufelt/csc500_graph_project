@@ -1,5 +1,13 @@
 import java.util.ArrayList;
 
+//imports for graphics
+import java.awt.image.BufferedImage;
+import java.awt.Graphics2D;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.ImageIcon;
+import java.awt.Color;
+
 public class BasicGraph {
     private ArrayList<BasicNode> nodes;
 
@@ -77,11 +85,72 @@ public class BasicGraph {
 
         return output;
     }
+    
+    //Drawing code
+    private BufferedImage drawer = null;
+    private JFrame frame; 
+    public static final int width = 512;  //window size
+    public static final int height = 512;
+    public static final double radius = 200; //radius for circle of nodes
+    public static final int nodeRadius = 8;
+    
+    //draws a point on the screen
+    public void draw(boolean labelNodes){
+        if (drawer == null)
+        {  //drawing for the first time
+            drawer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            frame = new JFrame("Graph");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            JLabel labelImage = new JLabel(new ImageIcon(drawer));
+            frame.getContentPane().add(labelImage);
+            frame.pack();
+            frame.setVisible(false);
+        }
+        Graphics2D g = drawer.createGraphics();
+        
+        //draw the edges
+        for (int i = 0; i < nodes.size(); i++)
+        {
+            for (int j = i; j < nodes.size(); j++)
+            {
+                if (nodes.get(i).getNeighbors().contains(nodes.get(j)))
+                {
+                    g.drawLine(getX(i), getY(i), getX(j), getY(j));
+                }
+            }
+        }   
+        //now draw nodes ontop
+        for (int i = 0; i < nodes.size(); i++)
+        {
+            g.setColor(nodes.get(i).getColor());
+            g.fillOval(getX(i) - nodeRadius / 2, getY(i) - nodeRadius / 2, nodeRadius, nodeRadius);
+            if (labelNodes)
+            {
+                g.drawString("" + i, getX(i) + 9, getY(i) + 5);
+            }
+        }
+        frame.setVisible(true);
+    }
+    
+    private int getX(int index) 
+    {
+        double angle = (double) index / nodes.size() * 2 * Math.PI;
+        double x = Math.cos(angle) * radius + width / 2;
+        return (int) x + nodeRadius / 2;
+    }
+    
+    private int getY(int index)
+    {
+        double angle = (double) index / nodes.size() * 2 * Math.PI;
+        double y = Math.sin(angle) * radius + width / 2;
+        return (int) y + nodeRadius / 2;
+    }
 
     public static void main(String[] args) {
-        BasicGraph graph = generateRandomGraph(7, 0.5);
+        BasicGraph graph = generateRandomGraph(40, 0.05);
         System.out.println(graph);
         System.out.println();
         graph.propagate(graph.nodes.get(0));
+        graph.draw(false);
     }
 }
